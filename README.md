@@ -33,7 +33,27 @@ The [code](Program.cs) will connect to OpenSearch, display its version, create a
 ```
 opensearch: 2.3.0
 
-{"Explanation":null,"Fields":null,"Highlight":{},"Id":"1","Index":"sample-index","InnerHits":{},"MatchedQueries":[],"Nested":null,"PrimaryTerm":null,"Routing":null,"Score":0.2876821,"SequenceNumber":null,"Sorts":[],"Source":{"Id":1,"FirstName":"Bruce"},"Type":null,"Version":0}
+{
+  "Explanation": null,
+  "Fields": null,
+  "Highlight": {},
+  "Id": "1",
+  "Index": "sample-index",
+  "InnerHits": {},
+  "MatchedQueries": [],
+  "Nested": null,
+  "PrimaryTerm": null,
+  "Routing": null,
+  "Score": 0.13353139,
+  "SequenceNumber": null,
+  "Sorts": [],
+  "Source": {
+    "Id": 1,
+    "FirstName": "Bruce"
+  },
+  "Type": null,
+  "Version": 0
+}
 ```
 
 ## License 

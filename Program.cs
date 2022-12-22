@@ -6,6 +6,7 @@
 */
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 using OpenSearch.Client;
 using OpenSearch.Net.Auth.AwsSigV4;
 
@@ -55,7 +56,10 @@ namespace Application
 
                 foreach (var result in results.Hits)
                 {
-                    Console.WriteLine(JsonConvert.SerializeObject(result));
+                    Console.WriteLine(JsonConvert.SerializeObject(
+                        result, 
+                        Formatting.Indented
+                    ));
                 }
 
                 client.Delete<Person>(document, idx => idx.Index(index_name));
