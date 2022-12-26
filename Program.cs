@@ -14,55 +14,58 @@ namespace Application
 {
     class Program
     {
-        protected class Person
+        protected class Movie
         {
             public int Id { get; set; }
-            public string? FirstName { get; set; }
+            public string? Title { get; set; }
+            public string? Director { get; set; }
+            public int? Year { get; set; }
         };
 
         static void Main(string[] args)
         {
             var endpoint = new Uri(Environment.GetEnvironmentVariable("OPENSEARCH_ENDPOINT") ?? throw new ArgumentNullException("Missing OPENSEARCH_ENDPOINT."));
-            var region = Amazon.RegionEndpoint.GetBySystemName(Environment.GetEnvironmentVariable("OPENSEARCH_REGION") ?? "us-west-2");
-            var connection = new AwsSigV4HttpConnection(region);
+            var connection = new AwsSigV4HttpConnection();
             var config = new ConnectionSettings(endpoint, connection);
             var client = new OpenSearchClient(config);
 
             Console.WriteLine($"{client.RootNodeInfo().Version.Distribution}: {client.RootNodeInfo().Version.Number}");
 
-            var index_name = "sample-index";
+            var index_name = "movies";
             var index = client.Indices.Create(index_name);
 
             try
             {
                 // index a document
-                var document = new Person()
+                var document = new Movie()
                 {
                     Id = 1,
-                    FirstName = "Bruce"
+                    Title = "Moneyball",
+                    Director = "Bennett Miller",
+                    Year = 2011
                 };
 
                 client.Index(document, idx => idx.Index(index_name));
 
                 // wait for the document to index
-                Thread.Sleep(3 * 1000);
+                Thread.Sleep(1 * 1000);
 
-                var results = client.Search<Person>(s => s
+                var results = client.Search<Movie>(s => s
                     .Index(index_name)
                     .Query(q => q.Match(
-                        mq => mq.Field(f => f.FirstName)
-                            .Query("bruce")))
+                        mq => mq.Field(f => f.Director)
+                            .Query("miller")))
                     );
 
                 foreach (var result in results.Hits)
                 {
                     Console.WriteLine(JsonConvert.SerializeObject(
-                        result, 
+                        result.Source,
                         Formatting.Indented
                     ));
                 }
 
-                client.Delete<Person>(document, idx => idx.Index(index_name));
+                client.Delete<Movie>(document, idx => idx.Index(index_name));
             }
             finally
             {
