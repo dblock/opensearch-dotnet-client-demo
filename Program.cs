@@ -24,7 +24,7 @@ namespace Application
 
         static void Main(string[] args)
         {
-            var endpoint = new Uri(Environment.GetEnvironmentVariable("OPENSEARCH_ENDPOINT") ?? throw new ArgumentNullException("Missing OPENSEARCH_ENDPOINT."));
+            var endpoint = new Uri(Environment.GetEnvironmentVariable("ENDPOINT") ?? throw new ArgumentNullException("Missing ENDPOINT."));
             var connection = new AwsSigV4HttpConnection();
             var config = new ConnectionSettings(endpoint, connection);
             var client = new OpenSearchClient(config);
