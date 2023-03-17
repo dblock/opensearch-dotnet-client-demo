@@ -1,6 +1,6 @@
 # OpenSearch DotNet (.NET) Client Demo
 
-Makes requests to Amazon OpenSearch using the [OpenSearch .NET Client](https://github.com/opensearch-project/opensearch-net).
+Makes requests to Amazon OpenSearch using the [OpenSearch .NET Client](https://github.com/opensearch-project/opensearch-net). Supports OpenSearch Serverless since OpenSearch.Net.Auth.AwsSigV4 1.3.0.
 
 ### Install Prerequisites
 
@@ -24,6 +24,7 @@ export AWS_SESSION_TOKEN=
 export AWS_REGION=us-west-2
 
 export ENDPOINT=https://....us-west-2.es.amazonaws.com
+export SERVICE=es # use 'aoss' for OpenSearch Serverless
 
 dotnet run
 ```
@@ -39,6 +40,12 @@ opensearch: 2.3.0
   "Director": "Bennett Miller",
   "Year": 2011
 }
+```
+
+Use `DEBUG` to trace requests.
+
+```
+DEBUG=1 dotnet run
 ```
 
 ## License 

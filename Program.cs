@@ -25,11 +25,22 @@ namespace Application
         static void Main(string[] args)
         {
             var endpoint = new Uri(Environment.GetEnvironmentVariable("ENDPOINT") ?? throw new ArgumentNullException("Missing ENDPOINT."));
-            var connection = new AwsSigV4HttpConnection();
+            var debug = Environment.GetEnvironmentVariable("DEBUG");
+            var service = Environment.GetEnvironmentVariable("SERVICE") ?? "es";
+            var connection = new AwsSigV4HttpConnection(service: service);
             var config = new ConnectionSettings(endpoint, connection);
+
+            if (debug != null) {
+                config.OnRequestCompleted(r => {
+                    Console.WriteLine(r.ToString());
+                });
+            }
+
             var client = new OpenSearchClient(config);
 
-            Console.WriteLine($"{client.RootNodeInfo().Version.Distribution}: {client.RootNodeInfo().Version.Number}");
+            if (service != "aoss") {
+                Console.WriteLine($"{client.RootNodeInfo().Version.Distribution}: {client.RootNodeInfo().Version.Number}");
+            }
 
             var index_name = "movies";
             var index = client.Indices.Create(index_name);
@@ -47,22 +58,30 @@ namespace Application
 
                 client.Index(document, idx => idx.Index(index_name));
 
-                // wait for the document to index
-                Thread.Sleep(1 * 1000);
+                while(true) {
+                    // wait for the document to index
+                    Thread.Sleep(1 * 1000);
 
-                var results = client.Search<Movie>(s => s
-                    .Index(index_name)
-                    .Query(q => q.Match(
-                        mq => mq.Field(f => f.Director)
-                            .Query("miller")))
-                    );
+                    var results = client.Search<Movie>(s => s
+                        .Index(index_name)
+                        .Query(q => q.Match(
+                            mq => mq.Field(f => f.Director)
+                                .Query("miller")))
+                        );
 
-                foreach (var result in results.Hits)
-                {
-                    Console.WriteLine(JsonConvert.SerializeObject(
-                        result.Source,
-                        Formatting.Indented
-                    ));
+                    // Console.WriteLine(results.ToString());
+
+                    foreach (var result in results.Hits)
+                    {
+                        Console.WriteLine(JsonConvert.SerializeObject(
+                            result.Source,
+                            Formatting.Indented
+                        ));
+                    }
+
+                    if (results.Hits.Count > 0) {
+                        break;
+                    }
                 }
 
                 client.Delete<Movie>(document, idx => idx.Index(index_name));
