@@ -30,6 +30,8 @@ namespace Application
             var connection = new AwsSigV4HttpConnection(service: service);
             var config = new ConnectionSettings(endpoint, connection);
 
+            config.ThrowExceptions();
+
             if (debug != null) {
                 config.OnRequestCompleted(r => {
                     Console.WriteLine(r.ToString());
